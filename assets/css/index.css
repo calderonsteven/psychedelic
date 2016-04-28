@@ -1,7 +1,12 @@
-*{
+body, canvas, #viewer{
   width: 100%;
   height: 100%;
   padding: 0;
   margin: 0;
   float: right;
+}
+
+.dg.a{
+  position: fixed;
+  overflow-x: inherit !important;
 }

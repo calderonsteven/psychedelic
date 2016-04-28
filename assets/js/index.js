@@ -12,11 +12,12 @@
             var $dom = $("#" + id);
 
             var scene = this.scene = window.scene = new THREE.Scene();
-            var camera = this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 1000);
 
+            var camera = this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 1000);
             camera.position.x = 0;
             camera.rotation.y = 0;
             camera.position.z = 38;
+            window.camera = camera;//kill me!!
 
             scene.add(camera);
 
@@ -120,6 +121,9 @@
             $(window).on('resize', updateRendererSize);
         }
 
+        restoreCamera: function(){
+
+        }
     };
 
     global.App = App;

@@ -7,9 +7,8 @@ var AudioHandler = function() {
 	var bpmTime = 0; // bpmTime ranges from 0 to 1. 0 = on beat. Based on tap bpm
 	var ratedBPMTime = 550;//time between beats (msec) multiplied by BPMRate
 	var levelHistory = []; //last 256 ave norm levels
-	var bpmStart; 
+	var bpmStart;
 
-	var sampleAudioURL = "../res/mp3/Cissy_Strut_Edit.mp3";
 	var BEAT_HOLD_TIME = 40; //num of frames to hold a beat
 	var BEAT_DECAY_RATE = 0.98;
 	var BEAT_MIN = 0.15; //a volume less than this is no beat
@@ -19,7 +18,7 @@ var AudioHandler = function() {
 	var msecsFirst = 0;
 	var msecsPrevious = 0;
 	var msecsAvg = 633; //time between beats (msec)
-	
+
 	var timer;
 	var gotBeat = false;
 	var beatCutOff = 0;
@@ -37,7 +36,7 @@ var AudioHandler = function() {
 	var freqByteData; //bars - bar data is from 0 - 256 in 512 bins. no sound is 0;
 	var timeByteData; //waveform - waveform data is from 0-256 for 512 bins. no sound is 128.
 	var levelsCount = 16; //should be factor of 512
-	
+
 	var binCount; //512
 	var levelBins;
 
@@ -53,9 +52,9 @@ var AudioHandler = function() {
 	function init() {
 
 		//EVENT HANDLERS
-		events.on("update", update);
+		//events.on("update", update);
 
-		audioContext = new window.webkitAudioContext();
+		audioContext = new window.AudioContext();
 		analyser = audioContext.createAnalyser();
 		analyser.smoothingTimeConstant = 0.8; //0<->1. 0 is no time smoothing
 		analyser.fftSize = 1024;
@@ -64,30 +63,13 @@ var AudioHandler = function() {
 
 		levelBins = Math.floor(binCount / levelsCount); //number of bins in each level
 
-		freqByteData = new Uint8Array(binCount); 
+		freqByteData = new Uint8Array(binCount);
 		timeByteData = new Uint8Array(binCount);
 
 		var length = 256;
 		for(var i = 0; i < length; i++) {
 		    levelHistory.push(0);
 		}
-
-		//INIT DEBUG DRAW
-		var canvas = document.getElementById("audioDebug");
-		debugCtx = canvas.getContext('2d');
-		debugCtx.width = debugW;
-		debugCtx.height = debugH;
-		debugCtx.fillStyle = "rgb(40, 40, 40)";
-		debugCtx.lineWidth=2;
-		debugCtx.strokeStyle = "rgb(255, 255, 255)";
-		$('#audioDebugCtx').hide();
-
-		gradient = debugCtx.createLinearGradient(0,0,0,256);
-		gradient.addColorStop(1,'#330000');
-		gradient.addColorStop(0.75,'#aa0000');
-		gradient.addColorStop(0.5,'#aaaa00');
-		gradient.addColorStop(0,'#aaaaaa');
-
 	}
 
 	function initSound(){
@@ -97,34 +79,27 @@ var AudioHandler = function() {
 
 	//load sample MP3
 	function loadSampleAudio() {
-
 		stopSound();
-
 		initSound();
 
-		
 		// Load asynchronously
 		var request = new XMLHttpRequest();
 		request.open("GET", ControlsHandler.audioParams.sampleURL, true);
 		request.responseType = "arraybuffer";
 
 		request.onload = function() {
-
-
 			audioContext.decodeAudioData(request.response, function(buffer) {
 				audioBuffer = buffer;
 				startSound();
 			}, function(e) {
 				console.log(e);
 			});
-
-
 		};
+
 		request.send();
 	}
 
 	function onTogglePlay(){
-
 		if (ControlsHandler.audioParams.play){
 			startSound();
 		}else{
@@ -148,7 +123,7 @@ var AudioHandler = function() {
 			source.stop(0);
 			source.disconnect();
 		}
-		debugCtx.clearRect(0, 0, debugW, debugH);
+		//debugCtx.clearRect(0, 0, debugW, debugH);
 	}
 
 	function onUseMic(){
@@ -160,15 +135,16 @@ var AudioHandler = function() {
 			stopSound();
 		}
 	}
-	
+
 	function onUseSample(){
 		if (ControlsHandler.audioParams.useSample){
-			loadSampleAudio();          
+			loadSampleAudio();
 			ControlsHandler.audioParams.useMic = false;
 		}else{
 			stopSound();
 		}
 	}
+
 	//load dropped MP3
 	function onMP3Drop(evt) {
 
@@ -217,7 +193,7 @@ var AudioHandler = function() {
 
 			navigator.getUserMedia(
 
-				{audio: true}, 
+				{audio: true},
 
 				function(stream) {
 
@@ -225,7 +201,7 @@ var AudioHandler = function() {
 					source = audioContext.createBufferSource();
 					analyser = audioContext.createAnalyser();
 					analyser.fftSize = 1024;
-					analyser.smoothingTimeConstant = 0.3; 
+					analyser.smoothingTimeConstant = 0.3;
 
 					microphone = audioContext.createMediaStreamSource(stream);
 					microphone.connect(analyser);
@@ -238,25 +214,24 @@ var AudioHandler = function() {
 					alert("The following error occured: " + err);
 				}
 			);
-			
+
 		}else{
 			alert("Could not getUserMedia");
 		}
 	}
 
 	function onBeat(){
+		console.log('you got the beat');
+
 		gotBeat = true;
 		if (ControlsHandler.audioParams.bpmMode) return;
-		events.emit("onBeat");
+		//events.emit("onBeat");
 	}
 
 
 	//called every frame
 	//update published viz data
 	function update(){
-
-
-
 		if (!isPlayingAudio) return;
 
 		//GET DATA
@@ -264,7 +239,6 @@ var AudioHandler = function() {
 		analyser.getByteTimeDomainData(timeByteData); // <-- waveform
 
 		//console.log(freqByteData);
-
 		//normalize waveform data
 		for(var i = 0; i < binCount; i++) {
 			waveData[i] = ((timeByteData[i] - 128) /128 )* ControlsHandler.audioParams.volSens;
@@ -290,7 +264,7 @@ var AudioHandler = function() {
 		for(var j = 0; j < levelsCount; j++) {
 			sum += levelsData[j];
 		}
-		
+
 		level = sum / levelsCount;
 
 		levelHistory.push(level);
@@ -310,14 +284,12 @@ var AudioHandler = function() {
 			}
 		}
 
-
 		bpmTime = (new Date().getTime() - bpmStart)/msecsAvg;
 		//trace(bpmStart);
-
-		debugDraw();
+		//debugDraw();
 	}
 
-	
+
 
 	function debugDraw(){
 
@@ -366,7 +338,9 @@ var AudioHandler = function() {
 		init:init,
 		level:level,
 		levelsData:levelsData,
-		onTogglePlay:onTogglePlay
+		onTogglePlay:onTogglePlay,
+
+		loadSampleAudio : loadSampleAudio
 	};
 
 }();
