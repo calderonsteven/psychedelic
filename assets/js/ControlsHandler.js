@@ -21,16 +21,16 @@ var ControlsHandler = function() {
 		f2.add(audioParams, 'volSens', 0, 5).step(0.1).name("Gain");
 		f2.add(audioParams, 'beatHoldTime', 0, 100).step(1).name("Beat Hold");
 		f2.add(audioParams, 'beatDecayRate', 0.9, 1).step(0.01).name("Beat Decay");
-		f2.add(audioParams, 'useRestoreCamera')
-			.listen()
-			.onChange(function(){
-				window.camera.position.x = 0;
-				window.camera.rotation.y = 0;
-				window.camera.position.z = 38;
-
-				window.camera.rotation.x = window.camera.rotation.y = window.camera.rotation.z = 0;
-			})
-			.name("Restore Camera");
+		// f2.add(audioParams, 'useRestoreCamera')
+		// 	.listen()
+		// 	.onChange(function(){
+		// 		window.camera.position.x = 0;
+		// 		window.camera.rotation.y = 0;
+		// 		window.camera.position.z = 38;
+		//
+		// 		window.camera.rotation.x = window.camera.rotation.y = window.camera.rotation.z = 0;
+		// 	})
+		// 	.name("Restore Camera");
 
 
 		f2.open();

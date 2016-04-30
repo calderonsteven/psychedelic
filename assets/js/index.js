@@ -119,7 +119,7 @@
             };
 
             $(window).on('resize', updateRendererSize);
-        }
+        },
 
         restoreCamera: function(){
 
