@@ -100,7 +100,7 @@ var AudioHandler = function() {
 	}
 
 	function onTogglePlay(){
-		if (ControlsHandler.audioParams.play){
+		if (!isPlayingAudio){
 			startSound();
 		}else{
 			stopSound();
@@ -108,9 +108,13 @@ var AudioHandler = function() {
 	}
 
 	function startSound() {
-		source.buffer = audioBuffer;
-		source.loop = true;
-		source.start(0.0);
+		if(!source.buffer){
+			source.buffer = audioBuffer
+			source.loop = true;
+			source.start(0.0);
+		}else {
+			source.context.resume()
+		}
 		isPlayingAudio = true;
 		//startViz();
 
@@ -121,7 +125,7 @@ var AudioHandler = function() {
 		isPlayingAudio = false;
 		if (source) {
 			source.stop(0);
-			source.disconnect();
+			//source.disconnect();
 		}
 		//debugCtx.clearRect(0, 0, debugW, debugH);
 	}
@@ -223,6 +227,12 @@ var AudioHandler = function() {
 	function onBeat(){
 		console.log('you got the beat');
 
+		var box = window.scene.getObjectByName('box1');
+		box.scale.x = box.scale.y = box.scale.z = 2;
+		setTimeout(function() {
+			box.scale.x = box.scale.y = box.scale.z = 1;
+		}, 100);
+
 		gotBeat = true;
 		if (ControlsHandler.audioParams.bpmMode) return;
 		//events.emit("onBeat");
@@ -231,7 +241,7 @@ var AudioHandler = function() {
 
 	//called every frame
 	//update published viz data
-	function update(){
+	function update(beatcallback){
 		if (!isPlayingAudio) return;
 
 		//GET DATA
@@ -273,6 +283,7 @@ var AudioHandler = function() {
 		//BEAT DETECTION
 		if (level  > beatCutOff && level > BEAT_MIN){
 			onBeat();
+			beatcallback();
 			beatCutOff = level *1.1;
 			beatTime = 0;
 		}else{

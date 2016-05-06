@@ -12,17 +12,16 @@
             var $dom = $("#" + id);
 
             var scene = this.scene = window.scene = new THREE.Scene();
+            var camera = this.camera = window.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 1000);
 
-            var camera = this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 1000);
             camera.position.x = 0;
             camera.rotation.y = 0;
             camera.position.z = 38;
-            window.camera = camera;//kill me!!
-
             scene.add(camera);
 
             //directional light
             var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+            directionalLight.name = 'mainlight';
             directionalLight.position.set( 0, 1, 0 );
             directionalLight.color.r = 0;
             directionalLight.color.g = 0.4;
@@ -78,6 +77,10 @@
 
             var squares = [],
                 numberOfSquares = 100;
+                //numberOfSquares = 10;
+
+            var squareTunel = new THREE.Object3D();
+            squareTunel.name = "tunel";
 
             //for (var i = 0; i < 3; i+=.1) {
             for (var i = 0; i < numberOfSquares; i++) {
@@ -86,22 +89,54 @@
               square.rotation.z = i;
               square.scale.x = square.scale.y = square.scale.z = 1 + (i * 0.1);
               squares.push(square);
-              scene.add(square);
+              squareTunel.add(square);
             }
+
+            scene.add(squareTunel);
+
+
+            //boxes
+            var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+            var material = new THREE.MeshNormalMaterial( { color: 0xffff00 } );
+            var box1 = new THREE.Mesh( geometry, material );
+            box1.name = 'box1';
+            box1.position.x = 4.38;
+            box1.position.y = 3.92;
+            box1.position.z = 30;
+            scene.add(box1);
+
 
             (function loop() {
               var delta = clock.getDelta();
 
+              //move back effect
               for (var i = 0; i < squares.length; i++) {
                 var square = squares[i];
                 square.rotation.z += .005;
                 square.position.z += .09;
+
+                // if(square.wasScaled){
+                //   square.wasScaled = false;
+                //   square.scale.x = square.scale.y = square.scale.z = square.lastScaled;
+                // }
+                //
+                // if(square.position.z >= (63*.4) && square.position.z <= (65*.4)){
+                //   square.wasScaled = true;
+                //   square.lastScaled = square.scale.y;
+                //
+                //   square.scale.x = square.scale.y = square.scale.z = (square.scale.z + 1.5);
+                //
+                //   square.name = 'XXXXX'
+                // }
 
                 if(square.position.z > (numberOfSquares * 0.4)){
                   square.position.z = 0;
                   //square.scale.x = square.scale.y = square.scale.z = 1;
                 }
               }
+
+              //detect beat
+              AudioHandler.update();
 
               controls.update();
               renderer.render(scene, camera);
