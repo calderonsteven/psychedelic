@@ -136,7 +136,9 @@
               }
 
               //detect beat
-              AudioHandler.update();
+              AudioHandler.update(function() {
+
+              });
 
               controls.update();
               renderer.render(scene, camera);
