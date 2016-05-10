@@ -13,10 +13,10 @@
 
             var scene = this.scene = window.scene = new THREE.Scene();
             var camera = this.camera = window.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 1000);
+            //var camera = this.camera = window.camera = new new THREE.PerspectiveCamera(90, 1, 0.001, 700);
+            //camera.position.set(0, 10, 0);
+            camera.position.set(0, 0, 38)
 
-            camera.position.x = 0;
-            camera.rotation.y = 0;
-            camera.position.z = 38;
             scene.add(camera);
 
             //directional light
@@ -30,10 +30,8 @@
 
             scene.add( directionalLight );
 
-            var renderer = new THREE.WebGLRenderer({
-                alpha: true,
-                antialias: true
-            });
+            var renderer = new THREE.WebGLRenderer(),
+                effect = new THREE.StereoEffect(renderer);
 
             renderer.setClearColor(0x000000);
             //renderer.setClearColor(0xffffff);
@@ -83,17 +81,35 @@
             squareTunel.name = "tunel";
 
             //for (var i = 0; i < 3; i+=.1) {
-            for (var i = 0; i < numberOfSquares; i++) {
+            for (var i = s = 0; i < numberOfSquares; i++, s+=.1) {
               var square = generateSquare(i);
               square.position.z = (i * 0.4);
               square.rotation.z = i;
-              square.scale.x = square.scale.y = square.scale.z = 1 + (i * 0.1);
+
+              //square.scale.x = square.scale.y = square.scale.z = 1 + (i * 0.1);
+              square.scale.x = square.scale.y = square.scale.z = ( Math.sin(s) + 2)
+
               squares.push(square);
               squareTunel.add(square);
             }
 
             scene.add(squareTunel);
 
+            function setOrientationControls(e) {
+              if (!e.alpha) {
+                return;
+              }
+
+              controls = new THREE.DeviceOrientationControls(camera, true);
+              controls.connect();
+              controls.update();
+
+              ControlsHandler.audioParams.useVr = true;
+
+              //element.addEventListener('click', fullscreen, false);
+              window.removeEventListener('deviceorientation', setOrientationControls, true);
+            }
+            window.addEventListener('deviceorientation', setOrientationControls, true);
 
             //boxes
             var geometry = new THREE.BoxGeometry( 1, 1, 1 );
@@ -106,6 +122,7 @@
             scene.add(box1);
 
 
+            //loop
             (function loop() {
               var delta = clock.getDelta();
 
@@ -113,20 +130,21 @@
               for (var i = 0; i < squares.length; i++) {
                 var square = squares[i];
                 square.rotation.z += .005;
-                square.position.z += .09;
+                square.position.z += .05;
 
                 // if(square.wasScaled){
                 //   square.wasScaled = false;
                 //   square.scale.x = square.scale.y = square.scale.z = square.lastScaled;
                 // }
                 //
+                // //the prefect view point is between 63 and 65
                 // if(square.position.z >= (63*.4) && square.position.z <= (65*.4)){
                 //   square.wasScaled = true;
                 //   square.lastScaled = square.scale.y;
                 //
                 //   square.scale.x = square.scale.y = square.scale.z = (square.scale.z + 1.5);
                 //
-                //   square.name = 'XXXXX'
+                //   square.name = 'XXXXX'//only debug
                 // }
 
                 if(square.position.z > (numberOfSquares * 0.4)){
@@ -137,13 +155,43 @@
 
               //detect beat
               AudioHandler.update(function() {
-
+                beatTheTunel();
               });
 
-              controls.update();
-              renderer.render(scene, camera);
+              camera.updateProjectionMatrix();
+              controls.update(delta);
+              if(ControlsHandler.audioParams.useVr){
+                  effect.render(scene, camera);
+              }else{
+                renderer.render(scene, camera);
+              }
               requestAnimationFrame(loop);
             })();
+
+            var beatTheTunel = function() {
+              for (var i = 0; i < squares.length; i++) {
+                var square = squares[i];
+
+                if(square.wasScaled){
+                  square.wasScaled = false;
+                  square.scale.x = square.scale.y = square.scale.z = square.lastScaled;
+                }
+
+                //the prefect view point is between 63 and 65
+                if(square.position.z >= (55*.4) && square.position.z <= (65*.4)){
+                  square.wasScaled = true;
+                  square.lastScaled = square.scale.y;
+
+                  square.scale.x = square.scale.y = square.scale.z = (square.scale.z + 2.5);
+
+                  square.name = 'XXXXX'//only debug
+
+                  setTimeout(function() {
+                    square.scale.x = square.scale.y = square.scale.z = square.lastScaled
+                  }, 2000)
+                }
+              }
+            };
 
             var updateRendererSize = function() {
                 var w = window.innerWidth;
@@ -153,9 +201,11 @@
                 camera.updateProjectionMatrix();
 
                 renderer.setSize(w, h);
+                effect.setSize(w, h);
             };
 
             $(window).on('resize', updateRendererSize);
+            updateRendererSize();
         },
 
         restoreCamera: function(){

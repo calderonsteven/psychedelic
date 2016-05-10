@@ -5,6 +5,7 @@ var ControlsHandler = function() {
 	var audioParams = {
 		useMic: false,
 		useSample:true,
+		useVr:true,
 		volSens:1,
 		beatHoldTime:40,
 		beatDecayRate:0.97,
@@ -37,12 +38,12 @@ var ControlsHandler = function() {
 		f2.add(audioParams, 'restoreCamera').name("Restore Camera");
 		f2.add(audioParams, 'loadSong').name("Play Song");
 		f2.add(audioParams, 'toggleSound').name("Toggle Song");
+		f2.add(audioParams, 'useVr').listen().onChange(function(){
+			//$('.dg.main').remove();
+			$(window).resize();
+		}).name("Use Vr");
 
 		f2.open();
-
-		//AudioHandler.onUseMic();
-		//AudioHandler.onUseSample();
-
 	}
 
 	return {
