@@ -10,3 +10,15 @@ body, canvas, #viewer{
   position: fixed;
   overflow-x: inherit !important;
 }
+
+#preloader{
+  display: none;
+  background-image: url(/assets/img/preloader.gif);
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  height: 58px;
+  width: 64px;
+  margin-left: -32px;
+  margin-top: -29px;
+}

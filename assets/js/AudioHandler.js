@@ -96,6 +96,7 @@ var AudioHandler = function() {
 			});
 		};
 
+		$("#preloader").show();
 		request.send();
 	}
 

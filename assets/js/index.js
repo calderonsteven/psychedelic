@@ -116,6 +116,7 @@
             var material = new THREE.MeshNormalMaterial( { color: 0xffff00 } );
             var box1 = new THREE.Mesh( geometry, material );
             box1.name = 'box1';
+            material.wireframe = true;
             box1.position.x = 4.38;
             box1.position.y = 3.92;
             box1.position.z = 30;
