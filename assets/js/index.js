@@ -48,7 +48,7 @@
 
             function generateSquare(i) {
               var sizeFactor = 1,
-                  skewFactor = sizeFactor / 4;
+                  skewFactor = sizeFactor / 2;
 
               //square
               var geometry = new THREE.Geometry();

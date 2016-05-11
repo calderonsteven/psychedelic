@@ -226,7 +226,7 @@ var AudioHandler = function() {
 	}
 
 	function onBeat(){
-		console.log('you got the beat');
+		//console.log('you got the beat');
 
 		var box = window.scene.getObjectByName('box1');
 		box.scale.x = box.scale.y = box.scale.z = 2;

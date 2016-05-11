@@ -13,12 +13,20 @@ body, canvas, #viewer{
 
 #preloader{
   display: none;
-  background-image: url(../img/preloader.gif);
+  /*background-image: url(../img/preloader.gif);*/
   position: fixed;
   left: 50%;
   top: 50%;
   height: 58px;
-  width: 64px;
-  margin-left: -32px;
+  width: 258px;
+  margin-left: -130px;
   margin-top: -29px;
+  color: white;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+
+#preloader > *{
+  display: inline-block;
 }
